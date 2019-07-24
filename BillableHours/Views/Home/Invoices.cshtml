@@ -1,0 +1,50 @@
+﻿@model BillableHours.Models.ViewModels.InvoiceViewModel
+@{
+    ViewData["Title"] = "Invoices";
+}
+
+<br />
+<div class="col-md-8 col-md-offset-2">
+    @foreach (var invoice in Model.Invoices)
+    {
+        <div class="panel panel-default">
+            <div class="panel-heading">Company: <strong>@Html.DisplayFor(model => invoice.CompanyName)</strong></div>
+            <div class="panel-body">
+                <table class="table table-bordered table-condensed">
+                    <thead class="bg-primary text-white">
+                        <tr>
+                            <th scope="col">Employee ID</th>
+                            <th scope="col">Number Of Hours</th>
+                            <th scope="col">Unit Price</th>
+                            <th scope="col">Cost</th>
+                        </tr>
+                    </thead>
+
+                    @foreach (var employee in invoice.Employees)
+                    {
+
+                        <tr>
+                            <td scope="row">@Html.DisplayFor(model => employee.Id)</td>
+                            <td>@Html.DisplayFor(model => employee.NumberOfHours)</td>
+                            <td>@Html.DisplayFor(model => employee.UnitPrice)</td>
+                            <td>@Html.DisplayFor(model => employee.TotalCost)</td>
+                        </tr>
+                    }
+
+                    <tfoot>
+                        <tr>
+                            <td></td>
+                            <td></td>
+                            <td><strong>Total:</strong> </td>
+                            <td>@Html.DisplayFor(model => invoice.TotalCost)</td>
+                        </tr>
+                    </tfoot>
+
+                </table>
+            </div>
+        </div>
+    }
+</div>
+
+
+

@@ -1,0 +1,17 @@
+﻿@model BillableHours.Models.ViewModels.ProjectsViewModel
+@{
+    ViewData["Title"] = "Projects";
+}
+
+<br />
+<h2>Projects</h2>
+<p>Click a project to generate and download its invoice.</p>
+
+<ul>
+
+    @foreach (var project in Model.ProjectNames)
+    {
+        <li> <a href="@Url.Action("Download", "Home", new {projectName = project, csvId = Model.CsvId })">@project</a></li>
+    }
+
+</ul>
