@@ -22,12 +22,15 @@
 
                     @foreach (var employee in invoice.Employees)
                     {
-
                         <tr>
                             <td scope="row">@Html.DisplayFor(model => employee.Id)</td>
                             <td>@Html.DisplayFor(model => employee.NumberOfHours)</td>
-                            <td>@Html.DisplayFor(model => employee.UnitPrice)</td>
-                            <td>@Html.DisplayFor(model => employee.TotalCost)</td>
+                            <td>
+                                @string.Format("{0:#,0.00}", employee.UnitPrice)
+                            </td>
+                            <td>
+                                @string.Format("{0:#,0.00}", employee.TotalCost)
+                            </td>
                         </tr>
                     }
 
@@ -36,7 +39,9 @@
                             <td></td>
                             <td></td>
                             <td><strong>Total:</strong> </td>
-                            <td>@Html.DisplayFor(model => invoice.TotalCost)</td>
+                            <td>
+                                @string.Format("{0:#,0.00}", invoice.TotalCost)
+                            </td>
                         </tr>
                     </tfoot>
 

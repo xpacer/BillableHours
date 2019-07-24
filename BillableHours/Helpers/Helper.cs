@@ -23,20 +23,21 @@ namespace BillableHours.Helpers
         public static IEnumerable<EmployeeShift> CreateRecordsFromFile(string csvId, IFormFile formFile, IDictionary<string, int> elementPositions, bool hasHeader = false)
         {
             var records = new List<EmployeeShift>();
-            Configuration csvConfig = new Configuration();
 
             using (var reader = new StreamReader(formFile.OpenReadStream()))
             using (var csv = new CsvReader(reader))
             {
+                csv.Configuration.RegisterClassMap(new EmployeeShiftMap(elementPositions));
                 csv.Configuration.HasHeaderRecord = hasHeader;
-                csv.Configuration.RegisterClassMap(new EmployeeShiftMap(elementPositions, csvId));
+
+                csv.Configuration.MissingFieldFound =
+                    (headerNames, index, context) => throw new Exception("Missing Field: " + headerNames[index]);
 
                 if (hasHeader)
-                {
-                    csv.Configuration.PrepareHeaderForMatch = (string header, int index) => header.ToLower();
-                }
+                    csv.Configuration.PrepareHeaderForMatch = (string header, int index) => header.ToLower().Replace("_", "");
 
                 records = csv.GetRecords<EmployeeShift>().ToList();
+                records.ForEach(x => x.CsvID = csvId);
             }
 
             return records;

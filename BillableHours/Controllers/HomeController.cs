@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using BillableHours.DataFactory;
 using BillableHours.Helpers;
+using BillableHours.Models.Data;
 using BillableHours.Models.ViewModels;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -62,14 +63,10 @@ namespace BillableHours.Controllers
             try
             {
                 if (model.File == null || model.File.ContentType != "text/csv")
-                {
                     throw new Exception("Please upload a valid CSV file!");
-                }
 
                 if (!ModelState.IsValid)
-                {
                     throw new Exception("One or more required input fields is empty!");
-                }
 
                 var columnPositions = new Dictionary<string, int>
                 {
@@ -81,32 +78,26 @@ namespace BillableHours.Controllers
                     { Constants.END_TIME_KEY, model.EndTime }
                 };
 
-                var columnPositionsCount = columnPositions.Count();
-
-                var columnPositionValues = columnPositions.Values.Select(c => c).Distinct().ToList();
+                int columnPositionsCount = columnPositions.Count();
+                List<int> columnPositionValues = columnPositions.Values.Select(c => c).Distinct().ToList();
 
                 if (columnPositionValues.Count() < columnPositionsCount)
-                {
                     //Duplicate values for column positions exist
                     throw new Exception("Invalid index set. Indices can not be duplicate");
-                }
 
                 if (columnPositions.Values.Min() < 0 || columnPositions.Values.Max() >= columnPositionsCount)
-                {
                     throw new Exception("Invalid index set. Index of a column can not be less than 0 or greater than "
                     + (columnPositionsCount - 1).ToString());
-                }
 
-                var csvId = Helper.GenerateCsvId();
 
-                var uploadedRecords = Helper.CreateRecordsFromFile(csvId, model.File, columnPositions, model.FirstRowHeader);
+                string csvId = Helper.GenerateCsvId();
+
+                IEnumerable<EmployeeShift> uploadedRecords = Helper.CreateRecordsFromFile(csvId, model.File, columnPositions, model.FirstRowHeader);
                 _dataProvider.AddEmployeeShifts(uploadedRecords);
 
                 // Redirects to a page to allow users to download PDF copies of CSV Data
                 if (model.GeneratePDF)
-                {
                     return RedirectToAction("Projects", new { csvId });
-                }
 
                 var viewModel = new InvoiceViewModel
                 {
@@ -138,9 +129,9 @@ namespace BillableHours.Controllers
             };
 
             if (csvData != null && csvData.Any())
-            {
                 viewModel.ProjectNames = csvData.Select(i => i.Project).Distinct();
-            }
+            else
+                viewModel.ProjectNames = new List<string>();
 
             return View(viewModel);
         }
@@ -154,12 +145,12 @@ namespace BillableHours.Controllers
         [HttpGet]
         public IActionResult Download(string csvId, string projectName)
         {
-            var csvData = _dataProvider.GetEmployeeShifts(csvId);
+            IEnumerable<EmployeeShift> csvData = _dataProvider.GetEmployeeShifts(csvId);
+            Invoice projectInvoice = Helper.GetInvoices(csvData).FirstOrDefault(i => i.CompanyName == projectName);
 
-            var projectInvoice = Helper.GetInvoices(csvData).FirstOrDefault(i => i.CompanyName == projectName);
-
-            var body = PdfHelper.GenerateInvoiceHtml(projectInvoice);
-            var outputPath = PdfHelper.RenderPDF(body);
+            string pdfName = csvId + "_" + projectName;
+            string body = PdfHelper.GenerateInvoiceHtml(projectInvoice);
+            string outputPath = PdfHelper.RenderPDF(body, pdfName);
 
             var fileService = new FileService(_fileProvider);
 

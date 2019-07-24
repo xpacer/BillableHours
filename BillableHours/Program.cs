@@ -4,11 +4,13 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using BillableHours.DataFactory.Database;
+using BillableHours.Helpers;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace BillableHours
 {
@@ -17,6 +19,7 @@ namespace BillableHours
         public static void Main(string[] args)
         {
             var webHost = BuildWebHost(args);
+
             InitializeDatabase(webHost);
 
             webHost.Run();
@@ -32,10 +35,18 @@ namespace BillableHours
             using (var scope = webHost.Services.CreateScope())
             {
                 var services = scope.ServiceProvider;
+
                 try
                 {
-                    var context = services.GetRequiredService<BillableDbContext>();
-                    DbInitializer.Initialize(context);
+                    var configuration = services.GetRequiredService<IConfiguration>();
+                    var appSettingsSection = configuration.GetSection("AppSettings");
+                    var appSettings = appSettingsSection.Get<AppSettings>();
+
+                    if (appSettings.UseDatabase)
+                    {
+                        var context = services.GetRequiredService<BillableDbContext>();
+                        DbInitializer.Initialize(context);
+                    }
                 }
                 catch (Exception ex)
                 {

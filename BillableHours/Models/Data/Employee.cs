@@ -2,7 +2,7 @@
 {
     public class Employee
     {
-        public string Id { get; set; }
+        public int Id { get; set; }
 
         public int NumberOfHours { get; set; }
 

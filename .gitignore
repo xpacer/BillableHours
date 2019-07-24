@@ -42,3 +42,6 @@ Thumbs.db
 
 # Mounted volume
 data/
+
+#Media files
+[Mm]edia/

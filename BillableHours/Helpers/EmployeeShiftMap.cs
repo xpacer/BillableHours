@@ -9,10 +9,8 @@ namespace BillableHours.Helpers
     /// </summary>
     public class EmployeeShiftMap : ClassMap<EmployeeShift>
     {
-        public EmployeeShiftMap(IDictionary<string, int> positions, string csvId)
+        public EmployeeShiftMap(IDictionary<string, int> positions)
         {
-            Map(m => m.CsvID).Constant(csvId);
-
             if (positions.ContainsKey(Constants.EMPLOYEE_ID_KEY))
                 Map(m => m.EmployeeId).Index(positions[Constants.EMPLOYEE_ID_KEY]);
 
