@@ -20,8 +20,8 @@ A web application that allows an outsourcing firm to upload a CSV of their emplo
 
 ### Using VS Code
 - Download .NET Core tools https://dotnet.microsoft.com/download
-- Run `dotnet build` on your terminal to build
-- Run `dotnet run` on your termi
+- Run `dotnet build` on your terminal in the app directory, `BillableHours` to build
+- Run `dotnet run` on your terminal in the app directory, `BillableHours` to run
 
 ### Using Docker to build
 - Install Docker Engine on your local machine from https://docs.docker.com/install/
@@ -35,7 +35,7 @@ A web application that allows an outsourcing firm to upload a CSV of their emplo
 - The IDE provides a way to run tests directly.
 
 ### Using VS Code
-- Run `dotnet test` on your terminal in the test folder directory to test.
+- Run `dotnet test` on your terminal in the test folder directory `BillableHours.Tests` to test.
 
 ## How to use?
 - Upload a CSV file containing the employee work shifts.
